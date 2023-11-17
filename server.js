@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const path = require('path')
 require('dotenv').config()
 const ShortUrl = require('./src/models/UrlModel')
+const routerUI = require('./src/routes/UrlRoutes')
 
 
 const app = express()
@@ -20,57 +21,18 @@ app.use(express.urlencoded({extended: false}))
 
 
 app.set('view engine', 'ejs')
+app.get('/', (req, res) => res.render('info'))
+app.use('/UIshortener', routerUI)
 
-app.get('/', async (req, res, next) => {
-    res.render('index')
-})
-
-app.get('/:shortId', async (req, res, next) => {
-    try {
-        const {shortId }= req.params
-        const result = await ShortUrl.findOne({shortId})
-        if(!result){
-            throw createHttpError.NotFound("Short url does not exists")
-        }
-        res.redirect(result.url)
-    } catch (error) {
-        next(error)
-        
-    }
-
-
-})
-
-app.post('/', async(req, res, next) => {
-    try {
-        const {url} = req.body
-        if(!url){
-            throw createHttpError.BadRequest('Provide a valid url')
-        }
-        const urlExists = await ShortUrl.findOne({url})
-        if(urlExists){
-            res.render('index', {short_url :  `${LINK}/${urlExists.shortId}`})
-            return
-        }
-
-        const shortUrl = new ShortUrl({url: url, shortId: shortId.generate() })
-        const result = await shortUrl.save()
-        res.render('index', 
-         {short_url :  `${LINK}/${result.shortId}`}
-        )
-
-    } catch (error) {
-        next(error)
-    }
-})
 
 app.use((req, res, next) => {
-    next(createHttpError.NotFound())
+     next(createHttpError.NotFound())
 })
 
 app.use((err, req, res, next) => {
     res.status(err.status  || 500)
-    res.render('index', {error: err.message})
+    //res.render('index', {error: err.message})
+    res.send(err.message)
 })
 
 

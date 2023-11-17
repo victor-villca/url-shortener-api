@@ -1,45 +1,50 @@
-require('dotenv').config()
-const ShortUrl = require('../models/UrlModel')
-const LINK = process.env.LINK_UI
+const createHttpError = require('http-errors');
+const ShortUrl = require('../models/UrlModel');
+const shortId = require('shortid');
 
-
-const getUI = async (req, res, next) => {
-    res.render('index.ejs')
-}
-const getUIShortId = async (req, res, next) => {
+async function renderIndex(req, res, next) {
     try {
-        const {shortId }= req.params
-        const result = await ShortUrl.findOne({shortId})
-        if(!result){
-            throw createHttpError.NotFound("Short url does not exists")
-        }
-        res.redirect(result.url)
+        res.render('index');
     } catch (error) {
-        next(error)
-        
+        next(error);
     }
 }
 
-const postUIshort = async (res, req, next) => {
+async function redirectShortUrl(req, res, next) {
     try {
-        const {url} = req.body
-        console.log(url)
-        if(!url){
-            throw createHttpError.BadRequest('Provide a valid url')
+        const { shortId } = req.params;
+        const result = await ShortUrl.findOne({ shortId });
+        if (!result) {
+            throw createHttpError.NotFound("Short URL does not exist");
         }
-        const urlExists = await ShortUrl.findOne({url})
-        if(urlExists){
-            res.render('index', {short_url :  `${LINK}/${urlExists.shortId}`})
-            return
+        res.redirect(result.url);
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function createShortUrl(req, res, next) {
+    try {
+        const { url } = req.body;
+        if (!url) {
+            throw createHttpError.BadRequest('Provide a valid URL');
+        }
+        const urlExists = await ShortUrl.findOne({ url });
+        if (urlExists) {
+            res.render('index', { short_url: `${process.env.LINK}/${urlExists.shortId}` });
+            return;
         }
 
-        const shortUrl = new ShortUrl({url: url, shortId: shortId.generate() })
-        const result = await shortUrl.save()
+        const shortUrl = new ShortUrl({ url: url, shortId: shortId.generate() });
+        const result = await shortUrl.save();
+        res.render('index', { short_url: `${process.env.LINK_UI}/${result.shortId}` });
     } catch (error) {
-        next(error)
+        next(error);
     }
 }
 
 module.exports = {
-    getUI, getUIShortId, postUIshort
-}
+    renderIndex,
+    redirectShortUrl,
+    createShortUrl,
+};

@@ -1,9 +1,10 @@
-const express = require('express')
-const {getUI, getUIShortId, postUIshort} = require('../controllers/UrlUIControllers')
+const express = require('express');
+const uiController = require('../controllers/UrlUIControllers')
 
-const urlUIRouter = express.Router();
-urlUIRouter.get("/", getUI)
-urlUIRouter.get("/:id", getUIShortId)
-urlUIRouter.post("/", postUIshort)
+const routerUI = express.Router();
 
-module.exports = urlUIRouter
+routerUI.get('/', uiController.renderIndex);
+routerUI.get('/:shortId', uiController.redirectShortUrl);
+routerUI.post('/', uiController.createShortUrl);
+
+module.exports = routerUI;
