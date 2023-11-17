@@ -6,6 +6,7 @@ const path = require('path')
 require('dotenv').config()
 const ShortUrl = require('./src/models/UrlModel')
 const routerUI = require('./src/routes/UrlRoutes')
+const apiRouter = require('./src/routes/ApiRoutes')
 
 
 const app = express()
@@ -22,16 +23,32 @@ app.use(express.urlencoded({extended: false}))
 
 app.set('view engine', 'ejs')
 app.get('/', (req, res) => res.render('info'))
+
 app.use('/UIshortener', routerUI)
+app.use('/api', apiRouter)
 
 
+app.get('/:shortId', async (req, res, next) => {
+    try {
+        const {shortId }= req.params
+        const result = await ShortUrl.findOne({shortId})
+        if(!result){
+            throw createHttpError.NotFound("Short url does not exists")
+        }
+        res.redirect(result.url)
+    } catch (error) {
+        next(error)
+
+    }
+
+
+})
 app.use((req, res, next) => {
      next(createHttpError.NotFound())
 })
 
 app.use((err, req, res, next) => {
     res.status(err.status  || 500)
-    //res.render('index', {error: err.message})
     res.send(err.message)
 })
 
