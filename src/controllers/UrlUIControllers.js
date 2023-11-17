@@ -31,7 +31,7 @@ async function createShortUrl(req, res, next) {
         }
         const urlExists = await ShortUrl.findOne({ url });
         if (urlExists) {
-            res.render('index', { short_url: `${process.env.LINK}/${urlExists.shortId}` });
+            res.render('index', { short_url: `${process.env.LINK_UI}/${urlExists.shortId}` });
             return;
         }
 
