@@ -1,4 +1,5 @@
 const express = require('express')
+var cors = require('cors')
 const shortId = require('shortid')
 const createHttpError = require('http-errors')
 const mongoose = require('mongoose')
@@ -15,6 +16,7 @@ const MONGO_CONNECTION = process.env.MONGO_URL
 const PORT = process.env.PORT
 const LINK = process.env.LINK
 
+app.use(cors())
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json())
