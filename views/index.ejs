@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Url shortener</title>
+</head>
+<body>
+    <h1>Url shortener</h1>
+
+    <% if(locals.error) { %>
+    <p class="error"><%= error %></p>
+    <% } %>
+     
+    <form action="/" method="post">
+        <input type="url" name="url" id="url" placeholder="Enter a URL">
+        <input type="submit" value="Create Url">
+    </form>
+    <div class="short-url">
+        <% if (locals.short_url) { %>
+        <a href="<%= short_url  %>"><%= short_url  %></a>
+        <% } %>
+    </div>
+</body>
+</html>
